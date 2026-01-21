@@ -1,15 +1,15 @@
 #include "DX3D/Game/Game.hpp"
 #include <Windows.h>
 
-
 void dx3d::Game::run()
 {
+	getLogger().log( dx3d::Logger::LogLevel::Info, "Gameloop started." );
+
 	MSG msg{};
 	while( m_isRunning )
 	{
 		while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
 		{
-
 			if( msg.message == WM_QUIT )
 			{
 				m_isRunning = false;
@@ -21,4 +21,6 @@ void dx3d::Game::run()
 		}
 		Sleep( 1 );
 	}
+	
+	getLogger().log( dx3d::Logger::LogLevel::Info, "Gameloop ended.");
 }
