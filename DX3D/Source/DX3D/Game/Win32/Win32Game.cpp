@@ -3,7 +3,7 @@
 
 void dx3d::Game::run()
 {
-	getLogger().log( dx3d::Logger::LogLevel::Info, "Gameloop started." );
+	DX3DLogInfo( "Gameloop started." );
 
 	MSG msg{};
 	while( m_isRunning )
@@ -21,6 +21,6 @@ void dx3d::Game::run()
 		}
 		Sleep( 1 );
 	}
-	
-	getLogger().log( dx3d::Logger::LogLevel::Info, "Gameloop ended.");
+
+	DX3DLogInfo( "Gameloop ended." );
 }

@@ -3,15 +3,16 @@
 
 namespace dx3d
 {
-	class Window final : public Base {
+	class Window : public Base {
 	public:
 
-		explicit Window(const WindowDesc& desc);
+		explicit Window( const WindowDesc& desc );
 		virtual ~Window() override;
 
-	private:
+	protected:
 
 		void* m_handle{};
+		Rect m_size{};
 
 	};
 }

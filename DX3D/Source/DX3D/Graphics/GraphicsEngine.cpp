@@ -4,14 +4,29 @@
 dx3d::GraphicsEngine::GraphicsEngine( const GraphicsEngineDesc& desc )
 	: Base( desc.base )
 {
-	getLogger().log( dx3d::Logger::LogLevel::Info, "GraphicsEngine initilization started..." );
+
+	{
+		SwapChainPtr sc{};
+		{
+			auto sys = std::make_unique<RenderSystem>( RenderSystemDesc{ getLogger() } );
+			sc = sys->createSwapChain( {} );
+		}
+	}
+
+
+	DX3DLogInfo( "GraphicsEngine initilization started..." );
 
 	m_renderSystem = std::make_unique<RenderSystem>( RenderSystemDesc{ getLogger() } );
 
-	getLogger().log( dx3d::Logger::LogLevel::Info, "GraphicsEngine initilized successfuly." );
+	DX3DLogInfo( "GraphicsEngine initilized successfuly." );
 }
 
 dx3d::GraphicsEngine::~GraphicsEngine()
 {
-	getLogger().log( dx3d::Logger::LogLevel::Info, "GraphicsEngine deallocated successfuly." );
+	DX3DLogInfo( "GraphicsEngine deallocated successfuly." );
+}
+
+dx3d::RenderSystem& dx3d::GraphicsEngine::getRenderSystem() const noexcept
+{
+	return *m_renderSystem;
 }

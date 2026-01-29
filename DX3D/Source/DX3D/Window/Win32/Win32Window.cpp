@@ -1,3 +1,5 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include "DX3D/Window/Window.hpp"
 #include <Windows.h>
 #include <stdexcept>
@@ -21,9 +23,8 @@ static LRESULT CALLBACK WindowProcedure( HWND hwnd, UINT msg, WPARAM wparam, LPA
 
 
 dx3d::Window::Window( const WindowDesc& desc )
-	: Base( desc.base )
+	: Base( desc.base ), m_size( desc.size )
 {
-
 	auto registerWindowClassFunction = []()
 	{
 		WNDCLASSEX wc{
@@ -35,41 +36,30 @@ dx3d::Window::Window( const WindowDesc& desc )
 	};
 
 	static const auto windowClassId = std::invoke( registerWindowClassFunction );
-	if( !windowClassId )
-	{
-		getLogger().log( dx3d::Logger::LogLevel::Error, "RegisterClassEx failed." );
-		throw std::runtime_error( "RegisterClassEx failed." );
-	}
+	if( !windowClassId ) DX3DLogErrorAndThrow( "RegisterClassEx failed." );
 
-	RECT rc{ 0, 0, 1280, 720 };
+	RECT rc{ 0, 0, m_size.width, m_size.height };
 	AdjustWindowRectEx( &rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, false, NULL );
-	getLogger().log(
-		dx3d::Logger::LogLevel::Info,
-		std::format(
-			"AdjustWindowRectEx result: Left {}, Right {}, Top {}, Bottom {}.\tTotal size: {}x{}",
-			rc.left, rc.right, rc.top, rc.bottom, (rc.right - rc.left), (rc.bottom - rc.top)
-		).c_str()
-	);
+	DX3DLogInfo( std::format( "AdjustWindowRectEx result: Left {}, Right {}, Top {}, Bottom {}.\tTotal size: {}x{}",
+							  rc.left, rc.right, rc.top, rc.bottom, (rc.right - rc.left), (rc.bottom - rc.top) ).c_str() );
 
 
 	m_handle = CreateWindowEx(
 		NULL, MAKEINTATOM( windowClassId ), L"DX11Triangle",
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
+		rc.right - rc.left, rc.bottom - rc.top,
 		nullptr, nullptr, nullptr, nullptr
 	);
-	if( !m_handle )
-	{
-		getLogger().log( dx3d::Logger::LogLevel::Error, "CreateWindowEx failed." );
-		throw std::runtime_error( "CreateWindowEx failed." );
-	}
+	if( !m_handle ) DX3DLogErrorAndThrow( "CreateWindowEx failed." );
 
 	ShowWindow( static_cast<HWND>(m_handle), SW_SHOW );
 }
 
 dx3d::Window::~Window()
 {
-	getLogger().log( dx3d::Logger::LogLevel::Info, "Window destructor started..." );
+	DX3DLogInfo( "Window deallocation started..." );
+
 	DestroyWindow( static_cast<HWND>(m_handle) );
-	getLogger().log( dx3d::Logger::LogLevel::Info, "Window destructor executed successfully!" );
+
+	DX3DLogInfo( "Window deallocated successfully!" );
 }
